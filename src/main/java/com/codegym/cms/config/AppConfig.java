@@ -1,9 +1,8 @@
 package com.codegym.cms.config;
 
-import com.codegym.cms.repository.CustomerRepository;
-import com.codegym.cms.repository.ICustomerRepository;
-import com.codegym.cms.service.CustomerService;
-import com.codegym.cms.service.ICustomerService;
+
+import com.codegym.cms.formatter.ProvinceFormatter;
+import com.codegym.cms.service.ProvinceService;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -11,6 +10,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
@@ -33,7 +34,8 @@ import java.util.Properties;
 @Configuration
 @EnableWebMvc
 @EnableTransactionManagement
-@ComponentScan("com.codegym.cms.controller")
+@ComponentScan("com.codegym.cms")
+@EnableJpaRepositories("com.codegym.cms.repository")
 public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
 
     private ApplicationContext applicationContext;
@@ -69,6 +71,7 @@ public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
         viewResolver.setCharacterEncoding("UTF-8");
         return viewResolver;
     }
+
 
     //Cấu hình JPA
     @Bean
@@ -113,13 +116,8 @@ public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
         return properties;
     }
 
-    @Bean
-    public ICustomerRepository customerRepository() {
-        return new CustomerRepository();
-    }
-
-    @Bean
-    public ICustomerService customerService() {
-        return new CustomerService();
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addFormatter(new ProvinceFormatter(applicationContext.getBean(ProvinceService.class)));
     }
 }
